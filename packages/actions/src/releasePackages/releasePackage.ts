@@ -41,7 +41,7 @@ async function gitTagAndRelease(release: ReleaseEntry, dry: boolean) {
 	}
 }
 
-export async function releasePackage(release: ReleaseEntry, dev: boolean, dry: boolean) {
+export async function releasePackage(release: ReleaseEntry, dry: boolean, devTag?: string) {
 	// Sanity check against the registry first
 	if (await checkRegistry(release)) {
 		info(`${release.name}@${release.version} already published, skipping.`);
@@ -51,10 +51,10 @@ export async function releasePackage(release: ReleaseEntry, dev: boolean, dry: b
 	if (dry) {
 		info(`[DRY] Releasing ${release.name}@${release.version}`);
 	} else {
-		await $`pnpm --filter=${release.name} publish --provenance --no-git-checks ${dev ? '--tag=dev' : ''}`;
+		await $`pnpm --filter=${release.name} publish --provenance --no-git-checks ${devTag ? `--tag=${devTag}` : ''}`;
 	}
 
-	if (!dev) await gitTagAndRelease(release, dry);
+	if (!devTag) await gitTagAndRelease(release, dry);
 
 	if (dry) return;
 
@@ -76,7 +76,7 @@ export async function releasePackage(release: ReleaseEntry, dev: boolean, dry: b
 		}, 15_000);
 	});
 
-	if (dev) {
+	if (devTag) {
 		// Send and forget, deprecations are less important than releasing other dev versions and can be done manually
 		void $`pnpm exec npm-deprecate --name "*dev*" --message "This version is deprecated. Please use a newer version." --package ${release.name}`
 			.nothrow()
