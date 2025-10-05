@@ -6,7 +6,8 @@ import {
 	type RESTGetAPIChannelThreadMemberQuery,
 	type RESTGetAPIChannelThreadMemberResult,
 	type RESTGetAPIChannelThreadMembersResult,
-	type Snowflake} from 'discord-api-types/v10';
+	type Snowflake,
+} from 'discord-api-types/v10';
 
 export class ThreadsAPI {
 	public constructor(private readonly rest: REST) {}
